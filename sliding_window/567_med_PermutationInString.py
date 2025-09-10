@@ -85,3 +85,10 @@ print(sol.checkInclusion_sliding(s1, s2))
 # Nhưng mà nó hơi khó hiểu :))
 # để làm được thì cũng dùng static sliding window kích thước len(s1)
 # sau đó dùng biến matches để đếm số lượng chữ cái có tần suất bằng nhau 
+# trường hợp dịch sang bên phải của node right thì thêm tần suất của chữ cái mới vào
+# và nếu tần suất của chữ cái mới bằng tần suất trong s1 thì tăng matches lên 1
+# nếu tần suất của chữ cái mới vượt quá tần suất trong s1 thì giảm matches đi 1
+# tương tự với node left thì giảm tần suất của chữ cái bị bỏ đi 
+# nếu tần suất của chữ cái bị bỏ đi bằng tần suất trong s1 thì tăng matches lên 1
+# nếu tần suất của chữ cái bị bỏ đi thấp hơn tần suất trong s1 thì giảm matches đi 1
+# cuối cùng nếu matches == 26 thì return True
