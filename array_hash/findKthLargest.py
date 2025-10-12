@@ -7,11 +7,6 @@ class Solution:
         left =  [x for x in nums if x > pivot]
         mid  =  [x for x in nums if x == pivot]
         right = [x for x in nums if x < pivot]
-        print(k, pivot)
-        print(left)
-        print(right)
-        print(mid)
-        print()
         L, M = len(left), len(mid)
         
         if k <= L:
@@ -25,3 +20,4 @@ sol = Solution()
 nums = [3,2,3,1,2,4,5,5,6]
 k = 1
 print(sol.findKthLargest(nums, k))
+
