@@ -1,75 +1,45 @@
 from typing import List
+import heapq
+from collections import defaultdict
+class Twitter:
 
-class TrieNode:
     def __init__(self):
-        self.children = {}
-        self.isWord = False
+        self.tweet = defaultdict(list)
+        self.followMap = defaultdict(set)
+        self.count = 0
         
-    def addWord(self, word):
-        cur = self
-        for c in word:
-            if c not in cur.children:
-                cur.children[c] = TrieNode()
-            cur = cur.children[c]
-        cur.isWord = True
-        
-class Solution:
 
-    def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:
-        ROWS, COLS = len(board), len(board[0]) 
-        res, visit = set(), set()
+    def postTweet(self, userId: int, tweetId: int) -> None:
+        self.tweet[userId].append((self.count, tweetId))
+        if len(self.tweet[userId]) > 10:
+            self.tweet[userId].pop(0)
+        self.count -= 1
         
-        root = TrieNode()
-        for w in words:
-            root.addWord(w)
+
+    def getNewsFeed(self, userId: int) -> List[int]:
+        minHip = []
+        res = []
+        self.followMap[userId].add(userId)
+        for u in self.followMap[userId]:
+            if u in self.tweet:
+                index = len(self.tweet[u]) - 1
+                ttime, tid = self.tweet[u][index]
+                heapq.heappush(minHip, (ttime, tid, u, index-1))
         
-        def dfs(r, c, node: TrieNode, word):
-            if (r < 0 or c < 0 or r == ROWS or c == COLS
-                or (r,c) in visit  
-                or board[r][c] not in node.children
-            ):
-                return
-            visit.add((r,c))
-            node = node.children[board[r][c]]
-            word += board[r][c]
-            if node.isWord:
+        while minHip and len(res) < 10:
+            ttime, tid, u, index = heapq.heappop(minHip)
+            res.append(tid)
+            
+            if index >= 0:
+                ttime, tid = self.tweet[u][index]
+                heapq.heappush(minHip, (ttime, tid, u, index-1))
                 
-                res.add(word)
-            
-            dfs(r-1,c, node, word)
-            dfs(r+1,c, node, word)
-            dfs(r,c-1, node, word)
-            dfs(r,c+1, node, word)
-            
-            visit.remove((r,c))
+        return res
+
+    
+    def follow(self, followerId: int, followeeId: int) -> None:
+        self.followMap[followerId].add(followeeId)
         
-        for i in range(ROWS):
-            for j in range(COLS):
-                dfs(i,j, root, "")
-        
-        return list(res)
-            
-
-
-board=[["a","b","c"],["a","e","d"],["a","f","g"]]
-words=["abcdefg","gfedcbaaa","eaabcdgfa","befa","dgc","ade"]
-
-sol = Solution()
-print(sol.findWords(board, words))
-
-# ["abcdefg","befa","eaabcdgfa","gfedcbaaa"]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def unfollow(self, followerId: int, followeeId: int) -> None:
+        if followeeId in self.followMap.get(followerId, set()):
+            self.followMap[followerId].remove(followeeId)
