@@ -1,45 +1,24 @@
 from typing import List
-import heapq
-from collections import defaultdict
-class Twitter:
+class Solution:
+    def combinationSum(self, nums: List[int], target: int) -> List[List[int]]:
+        rs = []
+        nums.sort()
+        def recur(start, cur: List, total):
+            if total > target or start == len(nums):
+                return True
+            if total == target:
+                rs.append(cur.copy())
+                return
+            cur.append(nums[start])
+            over = recur(start, cur,  total + nums[start])
+            cur.pop()
+            if not over:
+                recur(start + 1, cur, total)
+        recur(0, [], 0)
+        return rs
 
-    def __init__(self):
-        self.tweet = defaultdict(list)
-        self.followMap = defaultdict(set)
-        self.count = 0
-        
 
-    def postTweet(self, userId: int, tweetId: int) -> None:
-        self.tweet[userId].append((self.count, tweetId))
-        if len(self.tweet[userId]) > 10:
-            self.tweet[userId].pop(0)
-        self.count -= 1
-        
-
-    def getNewsFeed(self, userId: int) -> List[int]:
-        minHip = []
-        res = []
-        self.followMap[userId].add(userId)
-        for u in self.followMap[userId]:
-            if u in self.tweet:
-                index = len(self.tweet[u]) - 1
-                ttime, tid = self.tweet[u][index]
-                heapq.heappush(minHip, (ttime, tid, u, index-1))
-        
-        while minHip and len(res) < 10:
-            ttime, tid, u, index = heapq.heappop(minHip)
-            res.append(tid)
-            
-            if index >= 0:
-                ttime, tid = self.tweet[u][index]
-                heapq.heappush(minHip, (ttime, tid, u, index-1))
-                
-        return res
-
-    
-    def follow(self, followerId: int, followeeId: int) -> None:
-        self.followMap[followerId].add(followeeId)
-        
-    def unfollow(self, followerId: int, followeeId: int) -> None:
-        if followeeId in self.followMap.get(followerId, set()):
-            self.followMap[followerId].remove(followeeId)
+sol = Solution()
+nums = [2,3,6,7] 
+target = 7
+print(sol.combinationSum(nums, target))
